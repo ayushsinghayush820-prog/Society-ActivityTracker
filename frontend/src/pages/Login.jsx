@@ -19,7 +19,7 @@ const Login = () => {
         try {
             if (isRegistering) {
                 // --- REGISTER API CALL ---
-                await axios.post('http://127.0.0.1:5000/api/auth/register', {
+                await axios.post('https://society-activitytracker.onrender.com/api/auth/register', {
                     name,
                     email,
                     password,
@@ -30,7 +30,7 @@ const Login = () => {
                 setPassword('');
             } else {
                 // --- LOGIN API CALL ---
-                const response = await axios.post('http://127.0.0.1:5000/api/auth/login', {
+                const response = await axios.post('https://society-activitytracker.onrender.com/api/auth/login', {
                     email,
                     password
                 });

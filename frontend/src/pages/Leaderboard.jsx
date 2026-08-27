@@ -16,7 +16,7 @@ const Leaderboard = () => {
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:5000/api/users/leaderboard', {
+                const response = await axios.get('https://society-activitytracker.onrender.com/api/users/leaderboard', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setLeaders(response.data);
