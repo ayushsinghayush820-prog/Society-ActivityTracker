@@ -39,13 +39,13 @@ const AdminPanel = () => {
         const fetchAdminData = async () => {
             if (user && user.role === 'ADMIN') {
                 try {
-                    const memRes = await axios.get('https://society-activitytracker.onrender.com/api/contributions/users', {
+                    const memRes = await axios.get('https://society-activitytracker-production.up.railway.app/api/users/admin/members', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setMembers(memRes.data);
                     if(memRes.data.length > 0) setSelectedMember(memRes.data[0]._id);
 
-                    const statsRes = await axios.get('https://society-activitytracker.onrender.com/api/users/admin/stats', {
+                    const statsRes = await axios.get('https://society-activitytracker-production.up.railway.app/api/users/admin/stats', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setStats(statsRes.data);
@@ -62,7 +62,7 @@ const AdminPanel = () => {
         setEventMessage('Deploying event parameters...');
         try {
             const response = await axios.post(
-                'https://society-activitytracker.onrender.com/api/events',
+                'https://society-activitytracker-production.up.railway.app/api/events',
                 { title, date, startTime, eventType, checkInCode, points: eventPoints },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -78,14 +78,14 @@ const AdminPanel = () => {
         setContribMessage('Transmitting contribution data...');
         try {
             await axios.post(
-                'https://society-activitytracker.onrender.com/api/contributions',
+                'https://society-activitytracker-production.up.railway.app/api/contributions',
                 { memberId: selectedMember, title: contribTitle, category: contribCategory, points: contribPoints },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setContribMessage('Success! Points awarded to member.');
             setContribTitle(''); setContribPoints(5);
             
-            const statsRes = await axios.get('https://society-activitytracker.onrender.com/api/users/admin/stats', {
+            const statsRes = await axios.get('https://society-activitytracker-production.up.railway.app/api/users/admin/stats', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStats(statsRes.data);

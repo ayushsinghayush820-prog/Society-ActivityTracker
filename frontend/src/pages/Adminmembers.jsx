@@ -19,7 +19,7 @@ const AdminMembers = () => {
     useEffect(() => {
         const fetchMembers = async () => {
             try {
-                const res = await axios.get('https://society-activitytracker.onrender.com/api/users/admin/members', {
+                const res = await axios.get('https://society-activitytracker-production.up.railway.app/api/users/admin/members', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setMembers(res.data);
@@ -33,7 +33,7 @@ const AdminMembers = () => {
     const handleViewProfile = async (id) => {
         setLoading(true);
         try {
-            const res = await axios.get('https://society-activitytracker.onrender.com/api/users/admin/members/${id}', {
+            const res = await axios.get('https://society-activitytracker-production.up.railway.app/api/users/admin/members/${id}', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSelectedMemberDetail(res.data);
@@ -45,12 +45,12 @@ const AdminMembers = () => {
 
     const handleStatusChange = async (id, newStatus) => {
         try {
-            await axios.put(`https://society-activitytracker.onrender.com/api/users/admin/members/${id}/status`, 
+            await axios.put(`https://society-activitytracker-production.up.railway.app/api/users/admin/members/${id}/status`, 
                 { statusOverride: newStatus },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             // Refresh list
-            const res = await axios.get('https://society-activitytracker.onrender.com/api/users/admin/members', {
+            const res = await axios.get('https://society-activitytracker-production.up.railway.app/api/users/admin/members', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMembers(res.data);

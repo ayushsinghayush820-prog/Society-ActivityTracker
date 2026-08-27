@@ -20,7 +20,7 @@ const Dashboard = () => {
         const fetchTimeline = async () => {
             if (user) {
                 try {
-                    const res = await axios.get('https://society-activitytracker.onrender.com/api/users/me/timeline', {
+                    const res = await axios.get('https://society-activitytracker-production.up.railway.app/api/users/me/timeline', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setTimeline(res.data);
@@ -44,7 +44,7 @@ const Dashboard = () => {
 
         try {
             const response = await axios.post(
-                'https://society-activitytracker.onrender.com/api/attendance/check-in',
+                'https://society-activitytracker-production.up.railway.app/api/attendance/check-in',
                 { checkInCode },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -61,7 +61,7 @@ const Dashboard = () => {
             
             // Instantly refresh the timeline to show the new event
             try {
-                const res = await axios.get('https://society-activitytracker.onrender.com/api/users/me/timeline', {
+                const res = await axios.get('https://society-activitytracker-production.up.railway.app/api/users/me/timeline', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setTimeline(res.data);
