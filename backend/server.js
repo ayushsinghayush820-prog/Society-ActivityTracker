@@ -13,6 +13,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+app.set('trust proxy', 1); // <-- Yeh line add karni hai
 
 // Production Security Headers
 app.use(helmet());
