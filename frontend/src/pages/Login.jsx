@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 
 const Login = () => {
-    const [isRegistering, setIsRegistering] = useState(false); // Toggle between Login & Register
+    const [isRegistering, setIsRegistering] = useState(false);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -13,7 +14,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage('Processing...');
+        setMessage('Processing request...');
 
         try {
             if (isRegistering) {
@@ -23,9 +24,8 @@ const Login = () => {
                     email,
                     password,
                     department,
-                   // role: 'member' // Default role for web signups
                 });
-                setMessage('Account created successfully! Please login.');
+                setMessage('Credentials accepted! Please initiate login.');
                 setIsRegistering(false); // Switch back to login mode
                 setPassword('');
             } else {
@@ -46,29 +46,42 @@ const Login = () => {
                 }
             }
         } catch (error) {
-            setMessage(error.response?.data?.message || 'Authentication failed. Please check your details.');
+            setMessage(error.response?.data?.message || 'Authentication failed. Verify credentials.');
         }
     };
 
     return (
-        <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a', color: '#fff' }}>
-            <div className="dark-card" style={{ width: '400px', padding: '40px', border: '1px solid #222' }}>
-                
-                <h2 style={{ marginBottom: '10px', fontSize: '24px' }}>
-                    {isRegistering ? 'Create Account 🚀' : 'Welcome Back 👋'}
-                </h2>
-                <p style={{ color: '#666', fontSize: '13px', marginBottom: '30px' }}>
-                    {isRegistering ? 'Join the DTU Society tracking portal.' : 'Enter your credentials to access your portal.'}
-                </p>
+        <div className="flex relative h-screen justify-center items-center bg-charcoal-900 font-body text-gray-300">
+            
+            {/* Background Grid Pattern */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="z-10 w-full max-w-md bg-charcoal-800 border border-white/10 rounded-lg p-10 relative overflow-hidden shadow-2xl"
+            >
+                {/* Accent Glow line at the top */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-accent shadow-[0_0_15px_rgba(0,240,255,0.5)]"></div>
+
+                <div className="mb-10">
+                    <h2 className="text-3xl font-heading font-bold text-white tracking-tight">
+                        {isRegistering ? 'INITIALIZE_USER' : 'SYSTEM_LOGIN'}
+                    </h2>
+                    <p className="text-xs font-mono text-accent mt-2 tracking-widest uppercase">
+                        {isRegistering ? 'Create secure credentials' : 'Enter credentials to access'}
+                    </p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                     
                     {isRegistering && (
                         <div>
-                            <label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Full Name</label>
+                            <label className="text-xs font-mono text-gray-500 mb-2 block uppercase tracking-wider">Full Name</label>
                             <input 
                                 type="text" 
-                                className="dark-input" 
+                                className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-white font-mono rounded p-3 text-sm outline-none transition-all focus:shadow-[0_0_10px_rgba(0,240,255,0.1)]" 
                                 placeholder="e.g., Sameer" 
                                 value={name} 
                                 onChange={(e) => setName(e.target.value)} 
@@ -78,11 +91,11 @@ const Login = () => {
                     )}
 
                     <div>
-                        <label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Email Address</label>
+                        <label className="text-xs font-mono text-gray-500 mb-2 block uppercase tracking-wider">Email Array</label>
                         <input 
                             type="email" 
-                            className="dark-input" 
-                            placeholder="e.g., sameer@dtu.ac.in" 
+                            className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-white font-mono rounded p-3 text-sm outline-none transition-all focus:shadow-[0_0_10px_rgba(0,240,255,0.1)]" 
+                            placeholder="operative@dtu.ac.in" 
                             value={email} 
                             onChange={(e) => setEmail(e.target.value)} 
                             required 
@@ -90,10 +103,10 @@ const Login = () => {
                     </div>
 
                     <div>
-                        <label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Password</label>
+                        <label className="text-xs font-mono text-gray-500 mb-2 block uppercase tracking-wider">Security Key</label>
                         <input 
                             type="password" 
-                            className="dark-input" 
+                            className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-white font-mono rounded p-3 text-sm outline-none transition-all focus:shadow-[0_0_10px_rgba(0,240,255,0.1)]" 
                             placeholder="••••••••" 
                             value={password} 
                             onChange={(e) => setPassword(e.target.value)} 
@@ -103,12 +116,11 @@ const Login = () => {
 
                     {isRegistering && (
                         <div>
-                            <label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Department</label>
+                            <label className="text-xs font-mono text-gray-500 mb-2 block uppercase tracking-wider">Sector Element</label>
                             <select 
-                                className="dark-input" 
+                                className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-gray-300 font-mono rounded p-3 text-sm outline-none transition-all focus:shadow-[0_0_10px_rgba(0,240,255,0.1)] appearance-none"
                                 value={department} 
                                 onChange={(e) => setDepartment(e.target.value)}
-                                style={{ appearance: 'none' }}
                             >
                                 <option value="Technical">Technical</option>
                                 <option value="Design">Design</option>
@@ -120,28 +132,34 @@ const Login = () => {
                         </div>
                     )}
 
-                    <button type="submit" className="btn-dark btn-accent" style={{ marginTop: '10px', padding: '12px' }}>
-                        {isRegistering ? 'Sign Up' : 'Login'}
+                    <button 
+                        type="submit" 
+                        className="mt-6 w-full bg-charcoal-700 hover:bg-accent hover:text-charcoal-900 text-accent font-mono border border-accent rounded p-3 text-sm tracking-widest uppercase transition-all duration-300"
+                    >
+                        {isRegistering ? 'Execute Registration' : 'Authenticate'}
                     </button>
                 </form>
 
                 {message && (
-                    <p style={{ marginTop: '20px', fontSize: '13px', textAlign: 'center', color: message.includes('success') || message.includes('Successfully') ? '#4caf50' : '#f44336' }}>
-                        {message}
-                    </p>
+                    <motion.p 
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        className={`mt-4 text-xs font-mono text-center ${message.includes('accepted') || message.includes('Processing') ? 'text-accent' : 'text-red-400'}`}
+                    >
+                        &gt; {message}
+                    </motion.p>
                 )}
 
-                <div style={{ marginTop: '25px', textAlign: 'center', fontSize: '13px', color: '#888' }}>
-                    {isRegistering ? 'Already have an account? ' : "Don't have an account? "}
+                <div className="mt-8 text-center text-xs font-mono text-gray-500 uppercase tracking-widest">
+                    {isRegistering ? 'Existing protocol? ' : "No access code? "}
                     <span 
                         onClick={() => { setIsRegistering(!isRegistering); setMessage(''); }} 
-                        style={{ color: '#3b82f6', cursor: 'pointer', fontWeight: 'bold' }}
+                        className="text-accent cursor-pointer hover:underline transition-colors ml-1"
                     >
-                        {isRegistering ? 'Login here' : 'Sign up here'}
+                        {isRegistering ? '[ Initiate Login ]' : '[ Request Access ]'}
                     </span>
                 </div>
 
-            </div>
+            </motion.div>
         </div>
     );
 };

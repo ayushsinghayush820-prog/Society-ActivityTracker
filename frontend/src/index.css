@@ -1,306 +1,53 @@
 /* =========================================
-   GLOBAL RESET & TYPOGRAPHY
+   1. GOOGLE FONTS IMPORT
    ========================================= */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-body {
-  background-color: #f6f5f3; /* Soft off-white background for the login page */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
 
 /* =========================================
-   LOGIN SCREEN STYLES (Light Mode)
+   2. TAILWIND DIRECTIVES
    ========================================= */
-.login-wrapper {
-  display: flex;
-  width: 900px;
-  height: 600px;
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-  overflow: hidden; 
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-.login-left {
-  flex: 1;
-  background: linear-gradient(to right, rgba(46, 49, 146, 0.6), rgba(46, 49, 146, 0.8)), 
-              url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover;
-  display: none; 
-}
-
-@media (min-width: 768px) {
-  .login-left {
-    display: block;
+/* =========================================
+   3. GLOBAL BASE STYLES & OVERRIDES
+   ========================================= */
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
-}
 
-.login-right {
-  flex: 1;
-  padding: 50px 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: white;
-}
+  body {
+    /* Set the deepest background color globally to prevent white flashes */
+    background-color: #0a0a0a; 
+    color: #e5e7eb;
+    overflow-x: hidden;
+  }
 
-.brand-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
+  /* 
+     TECHY SCROLLBAR DESIGN 
+     Replaces the default ugly scrollbar with a sleek, neon-hover interface
+  */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
 
-.brand-logo {
-  font-size: 32px;
-  font-weight: 800;
-  color: #2e3192; 
-  margin-bottom: 5px;
-  letter-spacing: -1px;
-}
+  ::-webkit-scrollbar-track {
+    background: #0F1115; /* charcoal-800 */
+    border-left: 1px solid rgba(255, 255, 255, 0.05);
+  }
 
-.brand-tagline {
-  font-size: 13px;
-  color: #666;
-  font-weight: 500;
-}
+  ::-webkit-scrollbar-thumb {
+    background: #22252C; /* charcoal-600 */
+    border-radius: 10px;
+  }
 
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 12px;
-  color: #555;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.input-wrapper {
-  position: relative;
-}
-
-.input-wrapper input {
-  width: 100%;
-  padding: 12px 15px 12px 35px; 
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: all 0.3s;
-}
-
-.input-wrapper input:focus {
-  border-color: #2e3192;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(46, 49, 146, 0.1);
-}
-
-.input-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-.login-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  margin-bottom: 25px;
-  color: #666;
-}
-
-.login-options a {
-  color: #2e3192;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.btn-submit {
-  width: 100%;
-  padding: 14px;
-  background-color: #2e3192;
-  color: white;
-  border: none;
-  border-radius: 30px; 
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.btn-submit:hover {
-  background-color: #1c1e63;
-}
-
-.signup-text {
-  text-align: center;
-  font-size: 12px;
-  margin-top: 20px;
-  color: #666;
-}
-
-.signup-text a {
-  color: #2e3192;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-
-/* =========================================
-   DASHBOARD STYLES (Dark Mode)
-   ========================================= */
-
-/* This layout fixes itself to the screen, covering the light background of the body */
-.dashboard-layout {
-  display: flex;
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
-  background-color: #0a0a0a; 
-  color: #ffffff;
-  z-index: 10; 
-}
-
-/* Sidebar styling */
-.sidebar {
-  width: 70px;
-  background-color: #121212;
-  border-right: 1px solid #222;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 30px 0;
-  gap: 35px;
-}
-
-.sidebar-icon {
-  font-size: 20px;
-  color: #666;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.sidebar-icon:hover {
-  color: #fff;
-}
-
-/* Main Dashboard Area */
-.dashboard-main {
-  flex: 1;
-  padding: 40px 50px;
-  overflow-y: auto;
-}
-
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40px;
-}
-
-.dashboard-header h1 {
-  font-size: 24px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.user-profile-header {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  font-size: 14px;
-  color: #aaa;
-}
-
-.avatar {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background-color: #ff5722; 
-  border: 2px solid #222;
-}
-
-/* Grid Layout for Cards */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
-}
-
-.dark-card {
-  background-color: #151515;
-  border: 1px solid #222;
-  border-radius: 16px;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-}
-
-.dark-card h3 {
-  font-size: 16px;
-  font-weight: 500;
-  color: #eee;
-  margin-bottom: 15px;
-}
-
-.score-display {
-  font-size: 72px;
-  font-weight: 700;
-  color: #ff5722;
-  line-height: 1;
-  margin: 10px 0;
-}
-
-/* Dark Form Inputs */
-.dark-input {
-  background-color: #0f0f0f;
-  border: 1px solid #333;
-  color: #fff;
-  padding: 14px 18px;
-  border-radius: 10px;
-  width: 100%;
-  font-size: 14px;
-}
-
-.dark-input:focus {
-  outline: none;
-  border-color: #555;
-}
-
-.btn-dark {
-  background-color: #222;
-  color: #fff;
-  border: 1px solid #333;
-  padding: 14px 24px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-dark:hover {
-  background-color: #333;
-}
-
-.btn-accent {
-  background-color: #ff5722;
-  border: none;
-  color: #fff;
-}
-
-.btn-accent:hover {
-  background-color: #e64a19;
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00F0FF; /* Neon Cyan Accent Glow */
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  }
 }

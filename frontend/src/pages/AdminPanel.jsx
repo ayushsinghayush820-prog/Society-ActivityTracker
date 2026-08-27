@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 
 const AdminPanel = () => {
     const navigate = useNavigate();
@@ -9,7 +10,7 @@ const AdminPanel = () => {
     const token = localStorage.getItem('token');
     const user = userString ? JSON.parse(userString) : null;
 
-    // --- STATES ---
+    // --- STATES (UNTOUCHED) ---
     const [title, setTitle] = useState('');
     const [date, setDate] = useState('');
     const [startTime, setStartTime] = useState('');
@@ -25,7 +26,6 @@ const AdminPanel = () => {
     const [contribPoints, setContribPoints] = useState(5);
     const [contribMessage, setContribMessage] = useState('');
 
-    // --- NEW STATE FOR DASHBOARD STATS ---
     const [stats, setStats] = useState(null);
 
     const handleLogout = () => {
@@ -34,19 +34,17 @@ const AdminPanel = () => {
         navigate('/'); 
     };
 
-    // Fetch members and stats when component loads
+    // --- LOGIC (UNTOUCHED) ---
     useEffect(() => {
         const fetchAdminData = async () => {
             if (user && user.role === 'ADMIN') {
                 try {
-                    // 1. Fetch members for the contribution dropdown
                     const memRes = await axios.get('http://127.0.0.1:5000/api/contributions/users', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setMembers(memRes.data);
                     if(memRes.data.length > 0) setSelectedMember(memRes.data[0]._id);
 
-                    // 2. Fetch society stats for the dashboard overview
                     const statsRes = await axios.get('http://127.0.0.1:5000/api/users/admin/stats', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
@@ -61,33 +59,32 @@ const AdminPanel = () => {
 
     const handleCreateEvent = async (e) => {
         e.preventDefault();
-        setEventMessage('Creating event...');
+        setEventMessage('Deploying event parameters...');
         try {
             const response = await axios.post(
                 'http://127.0.0.1:5000/api/events',
                 { title, date, startTime, eventType, checkInCode, points: eventPoints },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            setEventMessage(`Success! "${response.data.title}" created.`);
+            setEventMessage(`Success! Event "${response.data.title}" deployed.`);
             setTitle(''); setDate(''); setStartTime(''); setCheckInCode(''); setEventPoints(10);
         } catch (error) {
-            setEventMessage(error.response?.data?.message || 'Failed to create event.');
+            setEventMessage(error.response?.data?.message || 'Failed to deploy event.');
         }
     };
 
     const handleLogContribution = async (e) => {
         e.preventDefault();
-        setContribMessage('Logging contribution...');
+        setContribMessage('Transmitting contribution data...');
         try {
             await axios.post(
                 'http://127.0.0.1:5000/api/contributions',
                 { memberId: selectedMember, title: contribTitle, category: contribCategory, points: contribPoints },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            setContribMessage('Success! Points awarded.');
+            setContribMessage('Success! Points awarded to member.');
             setContribTitle(''); setContribPoints(5);
             
-            // Refresh stats to show updated points instantly
             const statsRes = await axios.get('http://127.0.0.1:5000/api/users/admin/stats', {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -98,150 +95,200 @@ const AdminPanel = () => {
         }
     };
 
+    // --- ANIMATION CONFIG ---
+    const container = {
+        hidden: { opacity: 0 },
+        show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+    };
+
+    const item = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+    };
+
+    // Access Denied Screen (Redesigned)
     if (!user || user.role !== 'ADMIN') {
         return (
-            <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: '#0a0a0a', color: '#fff' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <h2>🚨 Access Denied</h2>
-                    <p style={{ color: '#666', marginTop: '10px' }}>You do not have administrator privileges.</p>
-                    <button className="btn-accent btn-dark" style={{ marginTop: '20px' }} onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
+            <div className="flex h-screen justify-center items-center bg-charcoal-900 font-body text-gray-300">
+                <div className="text-center bg-charcoal-800 p-10 border border-red-500/20 rounded-lg shadow-[0_0_20px_rgba(255,0,0,0.05)]">
+                    <h2 className="text-2xl font-heading text-red-500 tracking-widest uppercase mb-4">UNAUTHORIZED_ACCESS</h2>
+                    <p className="text-xs font-mono text-gray-500 mb-8">Root privileges required for this sector.</p>
+                    <button 
+                        onClick={() => navigate('/dashboard')}
+                        className="bg-charcoal-700 hover:bg-white hover:text-charcoal-900 text-white font-mono border border-white/20 rounded p-3 text-sm tracking-widest uppercase transition-all duration-300"
+                    >
+                        Return to Dashboard
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="dashboard-layout">
+        <div className="flex h-screen bg-charcoal-900 text-gray-300 font-body overflow-hidden">
             
-            {/* The Left Sidebar */}
-            <div className="sidebar">
-                <div className="sidebar-icon" onClick={() => navigate('/dashboard')} title="Dashboard">⊞</div>
-                <div className="sidebar-icon" onClick={() => navigate('/leaderboard')} title="Analytics">📊</div>
-                <div className="sidebar-icon" style={{ color: '#fff' }} title="Admin Panel">🛠️</div>
-                <div style={{ marginTop: 'auto' }} className="sidebar-icon" onClick={handleLogout} title="Logout">🚪</div>
-            </div>
+            {/* BACKGROUND GRID */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
 
-            {/* The Main Content */}
-            <div className="dashboard-main">
-                <div className="dashboard-header" style={{ marginBottom: '20px' }}>
-                    <h1>Admin Control Center</h1>
-                    <div className="user-profile-header">
-                        <span style={{ color: '#ff5722', fontWeight: 'bold' }}>ADMIN</span>
-                        <div className="avatar"></div>
-                    </div>
+            {/* SLIM TECH SIDEBAR */}
+            <aside className="w-16 md:w-20 bg-charcoal-800 border-r border-white/5 flex flex-col items-center py-6 z-10 shadow-2xl">
+                <div className="w-10 h-10 bg-charcoal-700 border border-white/10 rounded flex items-center justify-center text-accent font-bold mb-10 shadow-[0_0_10px_rgba(0,240,255,0.1)]">
+                    S_
                 </div>
-
-                {/* --- TOP ROW: SOCIETY OVERVIEW STATS --- */}
-                {stats && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-                        <div className="dark-card" style={{ padding: '20px', textAlign: 'center' }}>
-                            <div style={{ fontSize: '12px', color: '#888' }}>Total Members</div>
-                            <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#fff', marginTop: '10px' }}>{stats.total}</div>
-                        </div>
-                        <div className="dark-card" style={{ padding: '20px', textAlign: 'center', border: '1px solid rgba(76, 175, 80, 0.3)' }}>
-                            <div style={{ fontSize: '12px', color: '#4caf50' }}>Active</div>
-                            <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#4caf50', marginTop: '10px' }}>{stats.active}</div>
-                        </div>
-                        <div className="dark-card" style={{ padding: '20px', textAlign: 'center', border: '1px solid rgba(255, 152, 0, 0.3)' }}>
-                            <div style={{ fontSize: '12px', color: '#ff9800' }}>Low Activity</div>
-                            <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#ff9800', marginTop: '10px' }}>{stats.lowActivity}</div>
-                        </div>
-                        <div className="dark-card" style={{ padding: '20px', textAlign: 'center', border: '1px solid rgba(244, 67, 54, 0.3)' }}>
-                            <div style={{ fontSize: '12px', color: '#f44336' }}>Inactive</div>
-                            <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#f44336', marginTop: '10px' }}>{stats.inactive}</div>
-                        </div>
+                
+                <nav className="flex flex-col gap-6 w-full items-center">
+                    <div className="text-gray-500 hover:text-white cursor-pointer transition-colors" onClick={() => navigate('/dashboard')} title="Dashboard">
+                        <span className="text-xl">⊞</span>
                     </div>
-                )}
-
-                {/* --- MIDDLE ROW: THE FORMS --- */}
-                <div className="dashboard-grid">
-                    {/* Create Event Card */}
-                    <div className="dark-card">
-                        <h3>Deploy New Event</h3>
-                        <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>Generate a check-in code for society members.</p>
-                        <form onSubmit={handleCreateEvent} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            <div>
-                                <label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Event Title</label>
-                                <input type="text" className="dark-input" value={title} onChange={(e) => setTitle(e.target.value)} required />
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                <div><label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Date</label><input type="date" className="dark-input" value={date} onChange={(e) => setDate(e.target.value)} required /></div>
-                                <div><label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Start Time</label><input type="time" className="dark-input" value={startTime} onChange={(e) => setStartTime(e.target.value)} required /></div>
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '15px' }}>
-                                <div><label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Check-In Code</label><input type="text" className="dark-input" style={{ textTransform: 'uppercase' }} value={checkInCode} onChange={(e) => setCheckInCode(e.target.value.toUpperCase())} required /></div>
-                                <div><label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Points</label><input type="number" className="dark-input" value={eventPoints} onChange={(e) => setEventPoints(e.target.value)} required min="1" /></div>
-                            </div>
-                            <button type="submit" className="btn-dark btn-accent" style={{ marginTop: '10px' }}>Create Event</button>
-                        </form>
-                        {eventMessage && <div style={{ marginTop: '15px', padding: '10px', borderRadius: '8px', fontSize: '13px', backgroundColor: eventMessage.includes('Success') ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)', color: eventMessage.includes('Success') ? '#4caf50' : '#f44336' }}>{eventMessage}</div>}
+                    <div className="text-gray-500 hover:text-white cursor-pointer transition-colors" onClick={() => navigate('/leaderboard')} title="Analytics">
+                        <span className="text-xl">▤</span>
                     </div>
+                    <div className="text-accent cursor-pointer group relative" title="Admin Panel">
+                        <span className="text-xl">⚙</span>
+                        <div className="absolute left-10 opacity-0 group-hover:opacity-100 bg-charcoal-700 text-xs font-mono px-2 py-1 rounded transition-opacity">Root</div>
+                    </div>
+                </nav>
 
-                    {/* Log Contribution Card */}
-                    <div className="dark-card">
-                        <h3>Log Member Contribution</h3>
-                        <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>Manually award points for specific society tasks.</p>
-                        <form onSubmit={handleLogContribution} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            <div>
-                                <label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Select Member</label>
-                                <select className="dark-input" value={selectedMember} onChange={(e) => setSelectedMember(e.target.value)} required style={{ appearance: 'none' }}>
-                                    {members.length === 0 ? <option value="">Loading members...</option> : null}
-                                    {members.map(m => <option key={m._id} value={m._id}>{m.name} ({m.email})</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Task / Contribution Title</label>
-                                <input type="text" className="dark-input" placeholder="e.g., Designed Instagram Poster" value={contribTitle} onChange={(e) => setContribTitle(e.target.value)} required />
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '15px' }}>
+                <div className="mt-auto text-gray-500 hover:text-red-400 cursor-pointer transition-colors" onClick={handleLogout} title="Terminate Session">
+                    <span className="text-xl">✕</span>
+                </div>
+            </aside>
+
+            {/* MAIN CONTENT AREA */}
+            <main className="flex-1 p-6 md:p-10 overflow-y-auto z-10">
+                <motion.div variants={container} initial="hidden" animate="show" className="max-w-6xl mx-auto">
+                    
+                    {/* Header */}
+                    <header className="mb-10 flex justify-between items-end border-b border-white/5 pb-6">
+                        <div>
+                            <h1 className="text-3xl md:text-4xl font-heading font-semibold text-white tracking-tight">ADMIN_COMMAND_CENTER</h1>
+                            <p className="text-xs text-accent mt-2 font-mono tracking-widest uppercase">
+                                Identity: {user.name} // Status: Root Privileges
+                            </p>
+                        </div>
+                        <div className="hidden md:flex items-center gap-3 bg-charcoal-800 px-4 py-2 border border-accent/30 rounded-full shadow-[0_0_10px_rgba(0,240,255,0.1)]">
+                            <div className="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
+                            <span className="text-xs font-mono text-accent">ROOT_ACTIVE</span>
+                        </div>
+                    </header>
+
+                    {/* TOP ROW: STATS (New Color System) */}
+                    {stats && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                            <motion.div variants={item} className="bg-charcoal-800 border border-white/10 p-6 rounded-lg text-center flex flex-col justify-center relative overflow-hidden group hover:border-white/20 transition-all">
+                                <span className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">Total Operatives</span>
+                                <span className="text-4xl font-mono text-white">{stats.total}</span>
+                            </motion.div>
+                            
+                            <motion.div variants={item} className="bg-charcoal-800 border border-accent/20 p-6 rounded-lg text-center flex flex-col justify-center relative overflow-hidden group hover:border-accent/50 transition-all shadow-[inset_0_0_20px_rgba(0,240,255,0.02)]">
+                                <span className="text-xs font-mono text-accent uppercase tracking-widest mb-2">Active</span>
+                                <span className="text-4xl font-mono text-white">{stats.active}</span>
+                            </motion.div>
+                            
+                            <motion.div variants={item} className="bg-charcoal-800 border border-white/5 p-6 rounded-lg text-center flex flex-col justify-center relative overflow-hidden">
+                                <span className="text-xs font-mono text-status-low uppercase tracking-widest mb-2">Low Activity</span>
+                                <span className="text-4xl font-mono text-status-low">{stats.lowActivity}</span>
+                            </motion.div>
+                            
+                            <motion.div variants={item} className="bg-charcoal-900 border border-charcoal-700 p-6 rounded-lg text-center flex flex-col justify-center relative overflow-hidden">
+                                <span className="text-xs font-mono text-gray-600 uppercase tracking-widest mb-2">Inactive</span>
+                                <span className="text-4xl font-mono text-gray-600">{stats.inactive}</span>
+                            </motion.div>
+                        </div>
+                    )}
+
+                    {/* MIDDLE ROW: FORMS */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        
+                        {/* Event Deployment Form */}
+                        <motion.div variants={item} className="bg-charcoal-800 border border-white/10 rounded-lg p-6 group hover:border-white/20 transition-all">
+                            <h3 className="text-xs uppercase tracking-widest text-gray-500 font-mono mb-2">Deploy New Event</h3>
+                            <p className="text-xs text-gray-500 mb-6 font-mono">Generate a sync code for society members.</p>
+                            
+                            <form onSubmit={handleCreateEvent} className="flex flex-col gap-4">
                                 <div>
-                                    <label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Category</label>
-                                    <select className="dark-input" value={contribCategory} onChange={(e) => setContribCategory(e.target.value)} required style={{ appearance: 'none' }}>
-                                        <option value="Technical">Technical</option><option value="Design">Design</option><option value="Content">Content</option><option value="Management">Management</option><option value="Outreach">Outreach</option><option value="Event Operations">Event Operations</option>
+                                    <label className="text-xs font-mono text-gray-400 mb-2 block uppercase tracking-wider">Event Designation</label>
+                                    <input type="text" className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-white font-mono rounded p-3 text-sm outline-none transition-all" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div><label className="text-xs font-mono text-gray-400 mb-2 block uppercase tracking-wider">Date</label><input type="date" className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-gray-300 font-mono rounded p-3 text-sm outline-none transition-all" value={date} onChange={(e) => setDate(e.target.value)} required /></div>
+                                    <div><label className="text-xs font-mono text-gray-400 mb-2 block uppercase tracking-wider">Time</label><input type="time" className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-gray-300 font-mono rounded p-3 text-sm outline-none transition-all" value={startTime} onChange={(e) => setStartTime(e.target.value)} required /></div>
+                                </div>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="col-span-2"><label className="text-xs font-mono text-accent mb-2 block uppercase tracking-wider">Sync Code (Check-in)</label><input type="text" className="w-full bg-charcoal-900 border border-accent/50 focus:border-accent text-accent font-mono rounded p-3 text-sm outline-none uppercase transition-all shadow-[0_0_10px_rgba(0,240,255,0.05)]" value={checkInCode} onChange={(e) => setCheckInCode(e.target.value.toUpperCase())} required /></div>
+                                    <div className="col-span-1"><label className="text-xs font-mono text-gray-400 mb-2 block uppercase tracking-wider">Value (Pts)</label><input type="number" className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-white font-mono rounded p-3 text-sm outline-none transition-all" value={eventPoints} onChange={(e) => setEventPoints(e.target.value)} required min="1" /></div>
+                                </div>
+                                <button type="submit" className="mt-4 bg-charcoal-700 hover:bg-accent hover:text-charcoal-900 text-white font-mono border border-white/10 hover:border-accent rounded p-3 text-sm tracking-widest uppercase transition-all duration-300">Initialize Event</button>
+                            </form>
+                            {eventMessage && <p className={`mt-4 text-xs font-mono ${eventMessage.includes('Success') ? 'text-accent' : 'text-red-400'}`}>&gt; {eventMessage}</p>}
+                        </motion.div>
+
+                        {/* Contribution Logging Form */}
+                        <motion.div variants={item} className="bg-charcoal-800 border border-white/10 rounded-lg p-6 group hover:border-white/20 transition-all">
+                            <h3 className="text-xs uppercase tracking-widest text-gray-500 font-mono mb-2">Log Data Contribution</h3>
+                            <p className="text-xs text-gray-500 mb-6 font-mono">Manually append activity points to a user.</p>
+                            
+                            <form onSubmit={handleLogContribution} className="flex flex-col gap-4">
+                                <div>
+                                    <label className="text-xs font-mono text-gray-400 mb-2 block uppercase tracking-wider">Target Operative</label>
+                                    <select className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-gray-300 font-mono rounded p-3 text-sm outline-none transition-all appearance-none" value={selectedMember} onChange={(e) => setSelectedMember(e.target.value)} required>
+                                        {members.length === 0 ? <option value="">Fetching network members...</option> : null}
+                                        {members.map(m => <option key={m._id} value={m._id}>{m.name} ({m.email})</option>)}
                                     </select>
                                 </div>
-                                <div><label style={{ fontSize: '12px', color: '#888', marginBottom: '5px', display: 'block' }}>Points</label><input type="number" className="dark-input" value={contribPoints} onChange={(e) => setContribPoints(e.target.value)} required min="1" /></div>
-                            </div>
-                            <button type="submit" className="btn-dark" style={{ marginTop: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none' }}>Award Points</button>
-                        </form>
-                        {contribMessage && <div style={{ marginTop: '15px', padding: '10px', borderRadius: '8px', fontSize: '13px', backgroundColor: contribMessage.includes('Success') ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)', color: contribMessage.includes('Success') ? '#4caf50' : '#f44336' }}>{contribMessage}</div>}
-                    </div>
-                </div>
-
-                {/* --- BOTTOM ROW: AUTOMATED INACTIVITY TRACKER --- */}
-                {stats && stats.memberList && (
-                    <div className="dark-card" style={{ marginTop: '30px' }}>
-                        <h3>Member Inactivity Tracker</h3>
-                        <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>Automated categorization based on total society participation points.</p>
-                        
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            {stats.memberList.map(member => (
-                                <div key={member._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 20px', backgroundColor: '#0f0f0f', borderRadius: '10px', border: '1px solid #222' }}>
-                                    <div>
-                                        <div style={{ fontWeight: 'bold', color: '#fff', fontSize: '15px' }}>{member.name}</div>
-                                        <div style={{ fontSize: '12px', color: '#888', marginTop: '3px' }}>{member.department} • {member.score} Total Points</div>
-                                    </div>
-                                    
-                                    {/* The Dynamic Status Badge */}
-                                    <div style={{ 
-                                        padding: '6px 14px', 
-                                        borderRadius: '20px', 
-                                        fontSize: '11px', 
-                                        fontWeight: 'bold',
-                                        letterSpacing: '0.5px',
-                                        backgroundColor: member.status === 'ACTIVE' ? 'rgba(76, 175, 80, 0.1)' : member.status === 'LOW ACTIVITY' ? 'rgba(255, 152, 0, 0.1)' : 'rgba(244, 67, 54, 0.1)',
-                                        color: member.status === 'ACTIVE' ? '#4caf50' : member.status === 'LOW ACTIVITY' ? '#ff9800' : '#f44336',
-                                        border: `1px solid ${member.status === 'ACTIVE' ? 'rgba(76, 175, 80, 0.3)' : member.status === 'LOW ACTIVITY' ? 'rgba(255, 152, 0, 0.3)' : 'rgba(244, 67, 54, 0.3)'}`
-                                    }}>
-                                        {member.status}
-                                    </div>
+                                <div>
+                                    <label className="text-xs font-mono text-gray-400 mb-2 block uppercase tracking-wider">Task Designation</label>
+                                    <input type="text" className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-white font-mono rounded p-3 text-sm outline-none transition-all uppercase" placeholder="e.g., DEPLOYED_UI_UPDATE" value={contribTitle} onChange={(e) => setContribTitle(e.target.value)} required />
                                 </div>
-                            ))}
-                        </div>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="col-span-2">
+                                        <label className="text-xs font-mono text-gray-400 mb-2 block uppercase tracking-wider">Sector / Category</label>
+                                        <select className="w-full bg-charcoal-900 border border-white/10 focus:border-accent text-gray-300 font-mono rounded p-3 text-sm outline-none transition-all appearance-none" value={contribCategory} onChange={(e) => setContribCategory(e.target.value)} required>
+                                            <option value="Technical">Technical</option><option value="Design">Design</option><option value="Content">Content</option><option value="Management">Management</option><option value="Outreach">Outreach</option><option value="Event Operations">Event Operations</option>
+                                        </select>
+                                    </div>
+                                    <div className="col-span-1"><label className="text-xs font-mono text-accent mb-2 block uppercase tracking-wider">Value (Pts)</label><input type="number" className="w-full bg-charcoal-900 border border-accent/50 focus:border-accent text-accent font-mono rounded p-3 text-sm outline-none transition-all shadow-[0_0_10px_rgba(0,240,255,0.05)]" value={contribPoints} onChange={(e) => setContribPoints(e.target.value)} required min="1" /></div>
+                                </div>
+                                <button type="submit" className="mt-4 bg-accent/10 hover:bg-accent text-accent hover:text-charcoal-900 font-mono border border-accent/30 hover:border-accent rounded p-3 text-sm tracking-widest uppercase transition-all duration-300">Transmit Points</button>
+                            </form>
+                            {contribMessage && <p className={`mt-4 text-xs font-mono ${contribMessage.includes('Success') ? 'text-accent' : 'text-red-400'}`}>&gt; {contribMessage}</p>}
+                        </motion.div>
                     </div>
-                )}
 
-            </div>
+                    {/* BOTTOM ROW: MEMBER INACTIVITY LOG */}
+                    {stats && stats.memberList && (
+                        <motion.div variants={item} className="bg-charcoal-800 border border-white/10 rounded-lg p-6">
+                            <h3 className="text-xs uppercase tracking-widest text-gray-500 font-mono mb-2">Network Activity Log</h3>
+                            <p className="text-xs text-gray-500 mb-6 font-mono">Automated categorization based on total telemetry.</p>
+                            
+                            <div className="flex flex-col gap-3">
+                                {stats.memberList.map(member => (
+                                    <div key={member._id} className="flex justify-between items-center p-4 bg-charcoal-900 border border-white/5 rounded hover:border-white/10 transition-colors">
+                                        <div>
+                                            <div className="font-heading font-semibold text-gray-200 text-sm uppercase">{member.name}</div>
+                                            <div className="text-xs font-mono text-gray-500 mt-1 uppercase">
+                                                {member.department} <span className="text-charcoal-600 mx-2">|</span> {member.score} PTS
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Precision Status Badges */}
+                                        <div className={`px-3 py-1 text-[10px] font-mono tracking-widest uppercase rounded border ${
+                                            member.status === 'ACTIVE' 
+                                                ? 'bg-accent/10 border-accent/30 text-accent' 
+                                                : member.status === 'LOW ACTIVITY' 
+                                                    ? 'bg-status-low/10 border-status-low/30 text-status-low' 
+                                                    : 'bg-charcoal-900 border-gray-700 text-gray-600'
+                                        }`}>
+                                            {member.status === 'ACTIVE' && <span className="mr-2 inline-block w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>}
+                                            {member.status}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </motion.div>
+            </main>
         </div>
     );
 };
