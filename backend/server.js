@@ -19,12 +19,12 @@ app.set('trust proxy', 1); // <-- Yeh line add karni hai
 app.use(helmet());
 
 // Rate Limiting to prevent DDoS / Brute Force
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
-    message: { message: 'Too many requests from this IP, please try again after 15 minutes' }
-});
-app.use('/api/', limiter);
+// const limiter = rateLimit({
+   // windowMs: 15 * 60 * 1000, // 15 minutes
+  //  max: 100, // Limit each IP to 100 requests per windowMs
+  //  message: { message: 'Too many requests from this IP, please try again after 15 minutes' }
+//});
+// app.use('/api/', limiter);
 
 // CORS Configuration
 app.use(cors({
