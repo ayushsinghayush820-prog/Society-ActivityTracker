@@ -59,8 +59,8 @@ npm run dev
 To review the application and access different dashboard features, please use the following test accounts:
 
 **1. Admin Access (For transmitting points, creating events, and viewing system logs)**
-- **Email:** `review@dtutimes.com` 
-- **Password:** `admin123`
+- **Email:** 'ayushsinghayush820@gmail.com` 
+- **Password:** `@Ayush0507`
 
 **2. Member Access (For viewing personal dashboard and activity score)**
 - **Email:** `kabir@dtu.ac.in`
