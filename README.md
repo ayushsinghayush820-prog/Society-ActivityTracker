@@ -54,6 +54,21 @@ npm run dev
 
 ---
 
+## 🔐 Test Credentials
+
+To review the application and access different dashboard features, please use the following test accounts:
+
+**1. Admin Access (For transmitting points, creating events, and viewing system logs)**
+- **Email:** `review@dtutimes.com` 
+- **Password:** `admin123`
+
+**2. Member Access (For viewing personal dashboard and activity score)**
+- **Email:** `kabir@dtu.ac.in`
+- **Password:** `kabir123`
+
+*(Note: The backend is deployed on Railway, so the initial API request might take a few seconds to wake up).*
+
+
 ## 📝 Important Assumptions Made During Development
 
 1. **Self-Registration Role:** Any user signing up directly from the public web portal is assigned the `member` role by default to prevent unauthorized admin access. Admins must be manually upgraded in the database or created by a super-admin.
