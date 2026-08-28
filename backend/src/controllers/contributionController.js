@@ -2,17 +2,23 @@ router.post('/', async (req, res) => {
   try {
     const { userId, userEmail, email, task, category, points, value } = req.body;
     
-    // User dhoondho chahe ID se ho ya Email se
+    // 1. "Name (email@dtu.ac.in)" format se exact email nikalo
+    let searchEmail = email || userEmail;
+    if (searchEmail && searchEmail.includes('(') && searchEmail.includes(')')) {
+        searchEmail = searchEmail.split('(')[1].replace(')', '').trim();
+    }
+
+    // 2. Exact email ya userId se user dhoondho
     let user;
     if (userId) {
       user = await User.findById(userId);
-    } else if (email || userEmail) {
-      user = await User.findOne({ email: email || userEmail });
+    } else if (searchEmail) {
+      user = await User.findOne({ email: searchEmail });
     }
 
     const pointsToAdd = Number(points || value || 0);
 
-    // Contribution save karo
+    // 3. Contribution save karo
     const contribution = new Contribution({
       user: user ? user._id : null,
       task: task || 'Contribution',
@@ -22,9 +28,10 @@ router.post('/', async (req, res) => {
     });
     await contribution.save();
 
-    // User ke points update karo agar user mila
+    // 4. User ke points aur activityScore dono update karo (Jisse frontend par total dikhe)
     if (user) {
       user.points = (user.points || 0) + pointsToAdd;
+      user.activityScore = (user.activityScore || 0) + pointsToAdd;
       await user.save();
     }
 
