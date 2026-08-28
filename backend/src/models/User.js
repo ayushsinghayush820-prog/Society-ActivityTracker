@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['member', 'admin'],
+        // Removed strict enum to prevent frontend validation crashes
         default: 'member'
     },
     // Member-specific fields
@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema({
     joinDate: {
         type: Date,
         default: Date.now
+    },
+    // Added points field to prevent the "Transmit Points" 500 Server Error
+    points: {
+        type: Number,
+        default: 0
     },
     activityScore: {
         type: Number,
@@ -47,6 +52,5 @@ const userSchema = new mongoose.Schema({
         default: 'ACTIVE'
     }
 }, { timestamps: true }); 
-// timestamps: true automatically createdAt aur updatedAt fields add kar dega
 
 module.exports = mongoose.model('User', userSchema);
