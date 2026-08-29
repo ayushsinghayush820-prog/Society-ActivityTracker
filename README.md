@@ -13,7 +13,7 @@ The system combines attendance and contribution data to generate an Activity Sco
 
 ---
 
-## ⚙️ Environment Variables Required
+##  Environment Variables Required
 
 To run this project, you will need to add the following environment variables to your `.env` files.
 
@@ -29,7 +29,7 @@ To run this project, you will need to add the following environment variables to
 
 ---
 
-## 🛠️ Project Setup & Run Instructions
+##  Project Setup & Run Instructions
 
 Follow these steps to run the frontend and backend locally:
 
@@ -54,7 +54,7 @@ npm run dev
 
 ---
 
-## 🔐 Test Credentials
+##  Test Credentials
 
 To review the application and access different dashboard features, please use the following test accounts:
 
@@ -69,7 +69,7 @@ To review the application and access different dashboard features, please use th
 *(Note: The backend is deployed on Railway, so the initial API request might take a few seconds to wake up).*
 
 
-## 📝 Important Assumptions Made During Development
+##  Important Assumptions Made During Development
 
 1. **Self-Registration Role:** Any user signing up directly from the public web portal is assigned the `member` role by default to prevent unauthorized admin access. Admins must be manually upgraded in the database or created by a super-admin.
 2. **Event Windows:** It is assumed that an event's check-in window is controlled manually by the admin toggling the event status (e.g., Open/Closed), rather than a strict automated timer. This accounts for real-world delays in college events.
